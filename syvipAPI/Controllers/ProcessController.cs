@@ -2,16 +2,18 @@
 using Entities.All.Models.Admin;
 using Entities.All.DTO;
 using DataAccess.Repositories;
+using Microsoft.AspNetCore.Authorization;
 namespace syvipAPI.Controllers;
 
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = "Admin")]
 public class ProcessController : ControllerBase
 {
-    private readonly AdminRepository _adminRepository;
+    private readonly ProcessRepository _adminRepository;
 
-    public ProcessController(AdminRepository adminRepository)
+    public ProcessController(ProcessRepository adminRepository)
     {
         _adminRepository = adminRepository;
     }

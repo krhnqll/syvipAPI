@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
 
-public class AdminRepository 
+public class ProcessRepository 
 {
     public IResult<object> Deneme()
     {

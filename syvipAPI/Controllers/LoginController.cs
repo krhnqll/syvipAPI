@@ -10,16 +10,18 @@ namespace syvipAPI.Controllers;
 public class LoginController : Controller
 {
     private readonly AuthRepository _authRepository;
+    
 
     public LoginController(AuthRepository authRepository)
     {
         _authRepository = authRepository;
+        
     }
 
     [HttpGet("AuthControl")]
-    public IActionResult AuthControl()
+    public IActionResult AuthControl(UserInfoForLoginDto dto)
     {
-        var result = _authRepository.AuthControl();
+        var result = _authRepository.AuthControl(dto);
         return Ok(result); 
     }
 }
