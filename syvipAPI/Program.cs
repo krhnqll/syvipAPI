@@ -1,7 +1,12 @@
+using DataAccess;
 using DataAccess.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -11,6 +16,7 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddScoped<AdminRepository>();
+builder.Services.AddScoped<AuthRepository>();
 
 var app = builder.Build();
 

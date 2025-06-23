@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entities.All.Models.Admin
 {
-    internal class Admin
+    public class Admin
     {
     }
 }
