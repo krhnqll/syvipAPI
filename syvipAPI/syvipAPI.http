@@ -1,0 +1,6 @@
+@syvipAPI_HostAddress = http://localhost:5227
+
+GET {{syvipAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
