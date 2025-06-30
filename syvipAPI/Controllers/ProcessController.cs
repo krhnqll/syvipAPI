@@ -13,9 +13,17 @@ public class ProcessController : ControllerBase
 {
     private readonly ProcessRepository _adminRepository;
 
+
     public ProcessController(ProcessRepository adminRepository)
     {
         _adminRepository = adminRepository;
+    }
+
+    [HttpGet("Deneme")]
+    public IActionResult Deneme()
+    {
+        var result = _adminRepository.Deneme();
+        return Ok(result);
     }
 
     [HttpGet("GUsers")]
@@ -46,10 +54,17 @@ public class ProcessController : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("PReservation")]
+    [HttpPost("PReservation")]
     public IActionResult PReservation(SaveReservationDto dto)
     {
         var result = _adminRepository.PReservation(dto);
+        return Ok(result);
+    }
+
+    [HttpPost("PSavePhoto")]
+    public IActionResult PSavePhoto(SavePhotoDto dto)
+    {
+        var result = _adminRepository.PSavePhoto(dto);
         return Ok(result);
     }
 }

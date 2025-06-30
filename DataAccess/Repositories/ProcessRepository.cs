@@ -3,8 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
 
-public class ProcessRepository 
+public class ProcessRepository
 {
+
+    private readonly AppDbContext _context;
+
+    public ProcessRepository(AppDbContext context)
+    {
+        _context = context;
+    }
     public IResult<object> Deneme()
     {
         // Örnek geçici müşteri nesnesi (gerçek uygulamada veritabanına kaydedilir)
@@ -35,7 +42,15 @@ public class ProcessRepository
 
     public IResult<object> GUsers() // Sisteme giriş yapabilen kullanıcı kayıt bilgileri
     {
-        return Result<object>.SuccessResult("Başarılı.");
+        try
+        {
+            return Result<object>.SuccessResult("Başarılı.");
+        }
+        catch (Exception)
+        {
+            return Result<object>.ErrorResult("Hata");
+        }
+
     }
 
     public IResult<object> GReservations() // Tüm rezervasyon Kayıtları için
@@ -57,5 +72,10 @@ public class ProcessRepository
     {
         return Result<object>.SuccessResult("Başarılı.");
     }
-    
+
+    public IResult<object> PSavePhoto(SavePhotoDto dto) // Deneme için
+    {
+        return Result<object>.SuccessResult("Deneme başarılı.");
+    }
+
 }

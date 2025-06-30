@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -30,7 +31,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options =>
+
+builder.Services.AddDbContext<AppDbContext>(options => // AddDbContext Dependency Injectıon tanımı
     options.UseSqlServer(connectionString));
 // Add services to the container.
 

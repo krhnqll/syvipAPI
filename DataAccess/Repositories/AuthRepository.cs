@@ -7,10 +7,12 @@ namespace DataAccess.Repositories;
 public class AuthRepository
 {
     private readonly CreateToken _tokenGenerator;
+    private readonly AppDbContext _context;
 
-    public AuthRepository(IConfiguration config)
+    public AuthRepository(IConfiguration config, AppDbContext context)
     {
         _tokenGenerator = new CreateToken(config);
+        _context = context;
     }
 
     public IResult<object> AuthControl(UserInfoForLoginDto dto)
