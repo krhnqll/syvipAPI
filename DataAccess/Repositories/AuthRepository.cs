@@ -1,6 +1,9 @@
 ﻿using DataAccess.Helper;
+using DataAccess.Service.Abstract;
+using DataAccess.Service.Concrete;
 using Entities.All.DTO;
 using Microsoft.Extensions.Configuration;
+
 
 namespace DataAccess.Repositories;
 
@@ -15,7 +18,7 @@ public class AuthRepository
         _context = context;
     }
 
-    public IResult<object> AuthControl(UserInfoForLoginDto dto)
+    public IResult AuthControl(UserInfoForLoginDto dto)
     {
         try
         {
@@ -23,7 +26,7 @@ public class AuthRepository
 
             if (founderUser == null)
             {
-                return Result<object>.ErrorResult("Kullanıcı adı veya şifre hatalı.");
+                return new ErrorResult("Kullanıcı adı veya şifre hatalı.");
             }
 
             var hasher = new PasswordHasher();
@@ -31,20 +34,22 @@ public class AuthRepository
 
             if (!isPasswordValid)
             {
-                return Result<object>.ErrorResult("Kullanıcı adı veya şifre hatalı.");
+                return new ErrorResult("Kullanıcı adı veya şifre hatalı.");
             }
 
             string token = _tokenGenerator.GenerateJwtToken(dto.UserName);
 
-            return Result<object>.SuccessResult(new
+            var result = new LoginResponseDTO
             {
                 Token = token,
                 Message = "Giriş başarılı."
-            });
+            };
+
+            return new SuccessDataResult<LoginResponseDTO>(result);
         }
         catch
         {
-            return Result<object>.ErrorResult("Bir hata oluştu.");
+            return new ErrorResult("Bir hata oluştu.");
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using DataAccess.Helper;
+﻿using DataAccess.Service.Abstract;
+using DataAccess.Service.Concrete;
 using Entities.All.DTO;
+using Entities.All.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
@@ -13,7 +15,7 @@ public class ProcessRepository
     {
         _context = context;
     }
-    public IResult<object> Deneme()
+    public IResult Deneme()
     {
         // Örnek geçici müşteri nesnesi (gerçek uygulamada veritabanına kaydedilir)
         var tempCustomer = new
@@ -24,11 +26,11 @@ public class ProcessRepository
         };
 
         // Başarılı sonucu dön
-        return Result<object>.SuccessResult(tempCustomer, "APİ deneme başarılı.");
+        return new SuccessResult("APİ deneme başarılı.");
 
     }
 
-    public IResult<object> PostDeneme(DenemeDto dto)
+    public IResult PostDeneme(DenemeDto dto)
     {
         // Örnek geçici müşteri nesnesi (gerçek uygulamada veritabanına kaydedilir)
         var tempCustomer = new
@@ -38,56 +40,111 @@ public class ProcessRepository
             CreatedAt = DateTime.UtcNow
         };
         // Başarılı sonucu dön
-        return Result<object>.SuccessResult("Kayıt başarılı.");
+        return new SuccessResult("Kayıt başarılı.");
     }
 
-    public IResult<object> GUsers() // Sisteme giriş yapabilen kullanıcı kayıt bilgileri
+    public IResult GUsers() // Sisteme giriş yapabilen kullanıcı kayıt bilgileri
     {
         try
         {
-            var Users = _context.Users;
+            var Users = _context.Users.ToList();
 
-            return Result<object>.SuccessResult(Users, "Başarılı.");
+            return new SuccessDataResult<List<Users>>(Users, "Başarılı.");
         }
         catch (Exception)
         {
-            return Result<object>.ErrorResult("Hata");
+            return new ErrorResult("Hata");
         }
 
     }
 
-    public IResult<object> GReservations() // Tüm rezervasyon Kayıtları için
+    public IResult GReservations() // Tüm rezervasyon Kayıtları için
     {
         try
         {
-            var AllRezervations = _context.Rezervations;
+            var AllRezervations = _context.Rezervations.ToList();
 
-            return Result<object>.SuccessResult(AllRezervations, "Başarılı.");
+            return new SuccessDataResult<List<Rezervations>>(AllRezervations, "Başarılı.");
+
         }
         catch
         {
-            return Result<object>.ErrorResult("Hata");
+            return new ErrorResult("Hata");
         }
     }
 
-    public IResult<object> GReservationsById(int id) // Rezervayon Detayları İçin
+    public IResult GReservationsById(int id) // Rezervayon Detayları İçin
     {
-        return Result<object>.SuccessResult("Başarılı.");
+        try
+        {
+            var founderRez = _context.Rezervations.FirstOrDefault(r => r.Id == id);
+
+            if (founderRez == null)
+            {
+                return new ErrorResult("Kullanıcı adı veya şifre hatalı.");
+            }
+
+            return new SuccessDataResult<Rezervations>(founderRez, "Deneme başarılı.");
+        }
+        catch
+        {
+            return new ErrorResult("Hata");
+        }
+
     }
 
-    public IResult<object> GAllPhotos() // Tüm Fotoğraflar için 
+    public IResult GAllPhotos() // Tüm Fotoğraflar için 
     {
-        return Result<object>.SuccessResult("Başarılı.");
+        try
+        {
+            
+            return new SuccessResult("Deneme başarılı.");
+        }
+        catch
+        {
+            return new ErrorResult("Hata");
+        }
+        
     }
 
-    public IResult<object> PReservation(SaveReservationDto dto) // Rezervasyon oluşturma işlemi için
+    public IResult PReservation(SaveReservationDto dto) // Rezervasyon oluşturma işlemi için
     {
-        return Result<object>.SuccessResult("Başarılı.");
+        try
+        {
+            Rezervations reg = new Rezervations
+            {
+                Name = dto.Name,
+                Surname = dto.Surname,
+                TelNo = dto.TelNo,
+                RezDate = dto.RezDate,
+                RezTime = dto.RezTime,
+                StartLocation = dto.StartLocation,
+                EndLocation = dto.EndLocation,
+                Status = 1
+            };
+
+            _context.Entry(reg).State = EntityState.Added;
+            _context.SaveChanges();
+
+            return new SuccessResult("Rezervasyon kaydı başarılı.");
+        }
+        catch
+        {
+            return new ErrorResult("Rezervasyon Kaydı Esnasında Hata!");
+        } 
     }
 
-    public IResult<object> PSavePhoto(SavePhotoDto dto) // Deneme için
+    public IResult PSavePhoto(SavePhotoDto dto) // Foto Kaydetmek için
     {
-        return Result<object>.SuccessResult("Deneme başarılı.");
+        try
+        {
+            return new SuccessResult("Deneme başarılı.");
+        }
+        catch
+        {
+            return new ErrorResult("Hata");
+        }
+        
     }
 
 }
