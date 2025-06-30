@@ -1,4 +1,4 @@
-﻿namespace DataAccess.Repositories
+﻿namespace DataAccess.Helper
 {
     public class Result<T> : IResult<T>
     {

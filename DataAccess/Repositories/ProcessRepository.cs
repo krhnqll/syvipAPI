@@ -1,4 +1,5 @@
-﻿using Entities.All.DTO;
+﻿using DataAccess.Helper;
+using Entities.All.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories;
