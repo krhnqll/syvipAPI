@@ -45,7 +45,9 @@ public class ProcessRepository
     {
         try
         {
-            return Result<object>.SuccessResult("Başarılı.");
+            var Users = _context.Users;
+
+            return Result<object>.SuccessResult(Users, "Başarılı.");
         }
         catch (Exception)
         {
@@ -56,7 +58,16 @@ public class ProcessRepository
 
     public IResult<object> GReservations() // Tüm rezervasyon Kayıtları için
     {
-        return Result<object>.SuccessResult("Başarılı.");
+        try
+        {
+            var AllRezervations = _context.Rezervations;
+
+            return Result<object>.SuccessResult(AllRezervations, "Başarılı.");
+        }
+        catch
+        {
+            return Result<object>.ErrorResult("Hata");
+        }
     }
 
     public IResult<object> GReservationsById(int id) // Rezervayon Detayları İçin

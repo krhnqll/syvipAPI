@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Entities.All.Models.Admin;
 using Entities.All.DTO;
 using DataAccess.Repositories;
 using Microsoft.AspNetCore.Authorization;
