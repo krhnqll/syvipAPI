@@ -17,9 +17,23 @@ public class AuthRepository
 
     public IResult<object> AuthControl(UserInfoForLoginDto dto)
     {
-        // Sabit admin kontrolü (istersen DB'den de kontrol edebilirsin)
-        if (dto.UserName == "admin" && dto.Password == "1234")
+        try
         {
+            var founderUser = _context.Users.FirstOrDefault(u => u.UserName == dto.UserName);
+
+            if (founderUser == null)
+            {
+                return Result<object>.ErrorResult("Kullanıcı adı veya şifre hatalı.");
+            }
+
+            var hasher = new PasswordHasher();
+            bool isPasswordValid = hasher.VerifyPassword(dto.Password, founderUser.PasswordHash, founderUser.PasswordSalt);
+
+            if (!isPasswordValid)
+            {
+                return Result<object>.ErrorResult("Kullanıcı adı veya şifre hatalı.");
+            }
+
             string token = _tokenGenerator.GenerateJwtToken(dto.UserName);
 
             return Result<object>.SuccessResult(new
@@ -28,7 +42,10 @@ public class AuthRepository
                 Message = "Giriş başarılı."
             });
         }
-
-        return Result<object>.ErrorResult("Kullanıcı adı veya şifre hatalı.");
+        catch
+        {
+            return Result<object>.ErrorResult("Bir hata oluştu.");
+        }
     }
 }
+

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Entities.All.Models.Admin;
+using Entities.All;
 using System.Collections.Generic;
 
 namespace DataAccess
@@ -8,7 +8,7 @@ namespace DataAccess
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        public DbSet<Admin> Admin { get; set; }
+        public DbSet<Users> Users { get; set; }
 
     }
 }
