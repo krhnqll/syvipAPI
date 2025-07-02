@@ -53,12 +53,6 @@ public class ProcessController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("PReservation")]
-    public IActionResult PReservation(SaveReservationDto dto)
-    {
-        var result = _adminRepository.PReservation(dto);
-        return Ok(result);
-    }
 
     [HttpPost("PSavePhoto")]
     public IActionResult PSavePhoto(SavePhotoDto dto)

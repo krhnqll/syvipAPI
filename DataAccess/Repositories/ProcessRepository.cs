@@ -97,7 +97,6 @@ public class ProcessRepository
     {
         try
         {
-            
             return new SuccessResult("Deneme başarılı.");
         }
         catch
@@ -105,6 +104,19 @@ public class ProcessRepository
             return new ErrorResult("Hata");
         }
         
+    }
+
+    public IResult SendOtp(string phoneNumber)
+    {
+        string otp = new Random().Next(100000, 999999).ToString();
+
+        // OTP'yi bir yere kaydet (örnek: MemoryCache)
+        //_memoryCache.Set(phoneNumber, otp, TimeSpan.FromMinutes(5));
+
+        // SMS gönderme işlemi (SMS servisine göre değişir)
+        //SmsService.Send(phoneNumber, $"Rezervasyon kodunuz: {otp}");
+
+        return new SuccessResult("Doğrulama kodu gönderildi.");
     }
 
     public IResult PReservation(SaveReservationDto dto) // Rezervasyon oluşturma işlemi için
@@ -120,6 +132,7 @@ public class ProcessRepository
                 RezTime = dto.RezTime,
                 StartLocation = dto.StartLocation,
                 EndLocation = dto.EndLocation,
+                Email = dto.Email,
                 Status = 1
             };
 
