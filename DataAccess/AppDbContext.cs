@@ -11,6 +11,7 @@ namespace DataAccess
 
         public DbSet<Users> Users { get; set; }
         public DbSet<Rezervations> Rezervations { get; set; }
+        public DbSet<Photos> Photos { get; set; }
 
     }
 }

@@ -98,19 +98,31 @@ public class ProcessRepository
 
     }
 
-    public IResult GAllPhotos() // Tüm Fotoğraflar için 
+    public IDataResult<List<GetPhotoDto>> GAllPhotos()
     {
         try
         {
-            return new SuccessResult("Deneme başarılı.");
+            var photos = _context.Photos
+                .OrderByDescending(p => p.CreatedAt)
+                .Select(p => new GetPhotoDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
+                    FilePath = p.FilePath,
+                    CreatedAt = p.CreatedAt
+                })
+                .ToList();
+
+            return new SuccessDataResult<List<GetPhotoDto>>(photos, "Fotoğraflar başarıyla getirildi.");
         }
-        catch
+        catch (Exception ex)
         {
-            return new ErrorResult("Hata");
+            return new ErrorDataResult<List<GetPhotoDto>>(null, "Hata: " + ex.Message);
         }
-        
     }
-#endregion
+
+    #endregion
 
     #region OTP Process
 
@@ -128,7 +140,6 @@ public class ProcessRepository
     }
 
     #endregion
-
 
     #region POST Process
     public IResult PReservation(SaveReservationDto dto) // Rezervasyon oluşturma işlemi için
@@ -159,17 +170,46 @@ public class ProcessRepository
         } 
     }
 
-    public IResult PSavePhoto(SavePhotoDto dto) // Foto Kaydetmek için
+    public IResult PSavePhoto(SavePhotoDto dto)
     {
         try
         {
-            return new SuccessResult("Deneme başarılı.");
+            if (dto.PhotoFile == null || dto.PhotoFile.Length == 0)
+                return new ErrorResult("Fotoğraf dosyası boş.");
+
+            // uploads klasörünü oluştur
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            // Benzersiz dosya adı
+            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(dto.PhotoFile.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            // Fiziksel olarak kaydet
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                dto.PhotoFile.CopyTo(stream);
+            }
+
+            // Veritabanına kaydedilecek kayıt
+            var photo = new Photos
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                FilePath = "/uploads/" + uniqueFileName  // Web üzerinden erişilebilir yol
+            };
+
+            _context.Photos.Add(photo);  // EF DbContext
+            _context.SaveChanges();
+
+            return new SuccessResult("Fotoğraf başarıyla kaydedildi.");
         }
-        catch
+        catch (Exception ex)
         {
-            return new ErrorResult("Hata");
+            return new ErrorResult("Hata oluştu: " + ex.Message);
         }
-        
     }
+
     #endregion
 }
