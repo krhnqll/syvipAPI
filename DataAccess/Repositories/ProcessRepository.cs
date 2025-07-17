@@ -15,6 +15,8 @@ public class ProcessRepository
     {
         _context = context;
     }
+
+    #region Deneme Process
     public IResult Deneme()
     {
         // Örnek geçici müşteri nesnesi (gerçek uygulamada veritabanına kaydedilir)
@@ -43,13 +45,16 @@ public class ProcessRepository
         return new SuccessResult("Kayıt başarılı.");
     }
 
+    #endregion
+
+    #region GET Process
     public IResult GUsers() // Sisteme giriş yapabilen kullanıcı kayıt bilgileri
     {
         try
         {
-            var Users = _context.Users.ToList();
+            var Users = _context.Users.FirstOrDefault();
 
-            return new SuccessDataResult<List<Users>>(Users, "Başarılı.");
+            return new SuccessDataResult<Users?>(Users, "Başarılı.");
         }
         catch (Exception)
         {
@@ -105,6 +110,9 @@ public class ProcessRepository
         }
         
     }
+#endregion
+
+    #region OTP Process
 
     public IResult SendOtp(string phoneNumber)
     {
@@ -119,6 +127,10 @@ public class ProcessRepository
         return new SuccessResult("Doğrulama kodu gönderildi.");
     }
 
+    #endregion
+
+
+    #region POST Process
     public IResult PReservation(SaveReservationDto dto) // Rezervasyon oluşturma işlemi için
     {
         try
@@ -159,5 +171,5 @@ public class ProcessRepository
         }
         
     }
-
+    #endregion
 }

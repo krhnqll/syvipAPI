@@ -25,6 +25,8 @@ public class ProcessController : ControllerBase
         return Ok(result);
     }
 
+    #region GET Process
+
     [HttpGet("GUsers")]
     public IActionResult GUsers()
     {
@@ -53,12 +55,15 @@ public class ProcessController : ControllerBase
         return Ok(result);
     }
 
+    #endregion
 
+    #region POST Process
     [HttpPost("PSavePhoto")]
     public IActionResult PSavePhoto(SavePhotoDto dto)
     {
         var result = _adminRepository.PSavePhoto(dto);
         return Ok(result);
     }
+
+    #endregion
 }
-    
