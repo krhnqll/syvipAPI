@@ -21,24 +21,58 @@ public class ReservationService
         _sms = sms;
     }
 
-    public IResult SendOtp(string phoneNumber)
+    public async Task<IResult> SendOtpAsync(string phoneNumber)
     {
-        string otp = new Random().Next(100000, 999999).ToString();
+        // Güvenli OTP üretimi
+        var otp = new Random().Next(100000, 999999).ToString();
 
+        // 5 dakika boyunca geçerli olacak şekilde cache'e yaz
         _cache.Set(phoneNumber, otp, TimeSpan.FromMinutes(5));
+
+        // Daha önceki başarısız denemeleri sıfırla
+        string failKey = $"otp_fail_{phoneNumber}";
+        _cache.Remove(failKey);
+
+        // OTP'yi gönder (WhatsApp veya SMS üzerinden)
         _sms.SendSms(phoneNumber, $"Doğrulama kodunuz: {otp}");
 
         return new SuccessResult("Doğrulama kodu gönderildi.");
     }
 
-    public IResult VerifyAndCreateReservation(VerifyOtpDto dto)
+
+    public async Task<IResult> VerifyAndCreateReservationAsync(VerifyOtpDto dto)
     {
-        if (!_cache.TryGetValue(dto.Reservation.TelNo, out string realOtp))
+        var phoneNumber = dto.Reservation.TelNo;
+
+        // 1. OTP var mı?
+        if (!_cache.TryGetValue(phoneNumber, out string realOtp))
             return new ErrorResult("Kod süresi doldu veya bulunamadı.");
 
-        if (realOtp != dto.OtpCode)
-            return new ErrorResult("Kod hatalı!");
+        // 2. Kod eşleşiyor mu?
+        if (!string.Equals(realOtp?.Trim(), dto.OtpCode?.Trim(), StringComparison.Ordinal))
+        {
+            // Yanlış deneme sayısını al
+            string failKey = $"otp_fail_{phoneNumber}";
+            int failCount = _cache.GetOrCreate(failKey, entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+                return 0;
+            });
 
+            failCount++;
+            _cache.Set(failKey, failCount, TimeSpan.FromMinutes(5));
+
+            if (failCount >= 5)
+            {
+                _cache.Remove(phoneNumber);
+                _cache.Remove(failKey);
+                return new ErrorResult("Çok fazla başarısız giriş. Kod sıfırlandı, yeniden isteyiniz.");
+            }
+
+            return new ErrorResult($"Kod hatalı! ({failCount}/5)");
+        }
+
+        // 3. Kod doğru → rezervasyon kaydı yap
         var rez = new Rezervations
         {
             Name = dto.Reservation.Name,
@@ -53,10 +87,13 @@ public class ReservationService
         };
 
         _context.Entry(rez).State = EntityState.Added;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        _cache.Remove(dto.Reservation.TelNo);
+        // Kod ve yanlış giriş verilerini temizle
+        _cache.Remove(phoneNumber);
+        _cache.Remove($"otp_fail_{phoneNumber}");
 
         return new SuccessResult("Rezervasyon kaydı başarılı.");
     }
+
 }

@@ -12,28 +12,29 @@ var builder = WebApplication.CreateBuilder(args);
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
+builder.Services.AddMemoryCache(); // Telefon numarası limiti için
+
+
 builder.Services.AddRateLimiter(options =>
 {
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    options.AddPolicy("otp_policy", context =>
     {
-        var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var ip = context.Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
-        return RateLimitPartition.GetFixedWindowLimiter(ipAddress, _ => new FixedWindowRateLimiterOptions
+        return RateLimitPartition.GetTokenBucketLimiter(ip, key => new TokenBucketRateLimiterOptions
         {
-            PermitLimit = 5,
-            Window = TimeSpan.FromMinutes(1),
+            TokenLimit = 5,
+            TokensPerPeriod = 5,
+            ReplenishmentPeriod = TimeSpan.FromMinutes(1),
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-            QueueLimit = 0
+            QueueLimit = 0,
+            AutoReplenishment = true
         });
     });
-
-    options.OnRejected = (context, token) =>
-    {
-        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-        return new ValueTask(context.HttpContext.Response.WriteAsync(
-            "Çok fazla istek gönderdiniz. Lütfen sonra tekrar deneyin.", token));
-    };
 });
+
+
+
 
 
 builder.Services.AddAuthentication(options =>
