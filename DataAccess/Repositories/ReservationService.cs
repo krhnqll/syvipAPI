@@ -34,7 +34,7 @@ public class ReservationService
         _cache.Remove(failKey);
 
         // OTP'yi gönder (WhatsApp veya SMS üzerinden)
-        _sms.SendSms(phoneNumber, $"Doğrulama kodunuz: {otp}");
+        _sms.SendSmsAsync(phoneNumber, $"S.Y VIP Rezervasyon Doğrulama Kodunuz: {otp}");
 
         return new SuccessResult("Doğrulama kodu gönderildi.");
     }
@@ -83,7 +83,8 @@ public class ReservationService
             EndLocation = dto.Reservation.EndLocation,
             RezTime = dto.Reservation.RezTime,
             RezDate = dto.Reservation.RezDate,
-            Status = 1
+            Status = 1,
+            CreatedTime = DateTime.Now,
         };
 
         _context.Entry(rez).State = EntityState.Added;

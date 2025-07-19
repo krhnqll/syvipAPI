@@ -8,7 +8,6 @@ namespace syvipAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin")]
     public class ReservationController : ControllerBase
     {
         private readonly IMemoryCache _memoryCache;

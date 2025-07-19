@@ -74,7 +74,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ProcessRepository>();
 builder.Services.AddScoped<AuthRepository>();
 builder.Services.AddMemoryCache();
-builder.Services.AddScoped<ISmsService, NetgsmSmsService>();
+builder.Services.AddScoped<ISmsService, WhatsAppService>();
 builder.Services.AddScoped<ReservationService>();
 
 var app = builder.Build();

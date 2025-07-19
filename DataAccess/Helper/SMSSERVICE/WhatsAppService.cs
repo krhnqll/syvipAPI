@@ -1,6 +1,5 @@
 ﻿using DataAccess.Helper.SMSSERVICE;
 using Microsoft.Extensions.Configuration;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 
@@ -15,10 +14,10 @@ public class WhatsAppService : ISmsService
         _httpClient = new HttpClient();
     }
 
-    public void SendSms(string phoneNumber, string message)
+    public async Task SendSmsAsync(string phoneNumber, string message)
     {
         var token = _config["WhatsApp:AccessToken"];
-        var phoneNumberId = _config["WhatsApp:PhoneNumberId"]; // Meta panelinden alınır
+        var phoneNumberId = _config["WhatsApp:PhoneNumberId"];
 
         var requestUrl = $"https://graph.facebook.com/v18.0/{phoneNumberId}/messages";
 
@@ -36,11 +35,11 @@ public class WhatsAppService : ISmsService
         _httpClient.DefaultRequestHeaders.Clear();
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-        var response = _httpClient.PostAsync(requestUrl, content).Result;
+        var response = await _httpClient.PostAsync(requestUrl, content);
 
         if (!response.IsSuccessStatusCode)
         {
-            var error = response.Content.ReadAsStringAsync().Result;
+            var error = await response.Content.ReadAsStringAsync();
             throw new Exception($"WhatsApp API Error: {error}");
         }
     }

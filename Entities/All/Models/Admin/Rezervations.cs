@@ -18,5 +18,6 @@ namespace Entities.All.Models.Admin
         public TimeSpan RezTime { get; set; }
         public DateOnly RezDate { get; set; }
         public int Status { get; set; } // 0 => Reddedilenler, 1 => Aktif Rezervasyonlar, 2 => Gerçekleşen Rezervasyonlar
+        public DateTime CreatedTime { get; set; }
     }
 }
